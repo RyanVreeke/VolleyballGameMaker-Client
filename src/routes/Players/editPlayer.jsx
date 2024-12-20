@@ -6,7 +6,7 @@ function EditPlayer() {
 	const [name, setName] = useState("");
 	const [submitted, setSubmitted] = useState(false);
 	const urlSlug = useParams();
-  const serverURL = import.meta.env.VITE_SERVER_URL;
+	const serverURL = import.meta.env.VITE_SERVER_URL;
 	const baseURL = `${serverURL}/api/players/${urlSlug.slug}`;
 
 	useEffect(() => {
@@ -84,25 +84,27 @@ function EditPlayer() {
 			{submitted ? (
 				<p>Player updated successfully!</p>
 			) : (
-				<form onSubmit={updatePlayer}>
-					<div>
-						<label>Player Name</label>
-						<input
-							type="text"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
-						/>
+				<div>
+					<form onSubmit={updatePlayer}>
+						<div>
+							<label>Player Name</label>
+							<input
+								type="text"
+								value={name}
+								onChange={(e) => setName(e.target.value)}
+							/>
 
-						<input type="submit" />
-					</div>
-				</form>
+							<input type="submit" />
+						</div>
+					</form>
+
+					<br />
+
+					<button onClick={deletePlayer} className="delete">
+						Delete Player
+					</button>
+				</div>
 			)}
-
-			<br />
-
-			<button onClick={deletePlayer} className="delete">
-				Delete Player
-			</button>
 		</div>
 	);
 }
