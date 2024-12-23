@@ -5,8 +5,12 @@ import { fetchPlayers } from "../../helpers/fetchPlayers";
 function Game() {
 	const [teamOnePlayersRoster, setTeamOnePlayersRoster] = useState([]);
 	const [teamTwoPlayersRoster, setTeamTwoPlayersRoster] = useState([]);
-	const [teamOnePlayersSelected, setTeamOnePlayersSelected] = useState({});
-	const [teamTwoPlayersSelected, setTeamTwoPlayersSelected] = useState({});
+	const [teamOnePlayersSelected, setTeamOnePlayersSelected] = useState(
+		new Map()
+	);
+	const [teamTwoPlayersSelected, setTeamTwoPlayersSelected] = useState(
+		new Map()
+	);
 	const [teamOneScore, setTeamOneScore] = useState(0);
 	const [teamTwoScore, setTeamTwoScore] = useState(0);
 	const [isLoading, setIsLoading] = useState(true);
@@ -33,38 +37,41 @@ function Game() {
 	const updatePlayersGameScore = async (e) => {
 		e.preventDefault();
 
-		console.log(teamOnePlayersSelected);
-		console.log(teamTwoPlayersSelected);
-
 		try {
-			var response
+			var response = null;
 
-			if(teamOneScore > teamTwoScore) {
+			if (teamOneScore > teamTwoScore) {
+				console.log("Team one wins");
 				response = await fetch(baseURL, {
 					method: "PUT",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
-						winningTeamPlayers: teamOnePlayersSelected,
-						losingTeamPlayers: teamTwoPlayersSelected
+						winningTeamPlayers: Object.fromEntries(
+							teamOnePlayersSelected
+						),
+						losingTeamPlayers: Object.fromEntries(
+							teamTwoPlayersSelected
+						),
 					}),
 				});
-
-				console.log(response);
-			} else {
+			} else if (teamOneScore < teamTwoScore) {
+				console.log("Team two wins");
 				response = await fetch(baseURL, {
 					method: "PUT",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
-						winningTeamPlayers: teamTwoPlayersSelected,
-						losingTeamPlayers: teamOnePlayersSelected
+						winningTeamPlayers: Object.fromEntries(
+							teamOnePlayersSelected
+						),
+						losingTeamPlayers: Object.fromEntries(
+							teamTwoPlayersSelected
+						),
 					}),
 				});
-				console.log(response);
 			}
 
 			if (response.ok) {
-				setTeamOnePlayersSelected({});
-				setTeamTwoPlayersSelected({});
+				console.log("Updated players game score.");
 				setTeamOneScore(0);
 				setTeamTwoScore(0);
 			} else {
@@ -74,7 +81,7 @@ function Game() {
 			console.log(error);
 			setError(error);
 		}
-	}
+	};
 
 	return (
 		<div>
@@ -96,17 +103,27 @@ function Game() {
 										<PlayerButton
 											player={player}
 											onPlayerButtonClick={(
-												player,
 												buttonSelected
 											) => {
 												if (buttonSelected) {
-													teamOnePlayersSelected[
-														player._id
-													] = player;
+													const newMap =
+														teamOnePlayersSelected.set(
+															player._id,
+															player
+														);
+													setTeamOnePlayersSelected(
+														newMap
+													);
 												} else {
-													delete teamOnePlayersSelected[
-														player._id
-													];
+													const newMap =
+														teamOnePlayersSelected.delete(
+															player._id
+														);
+													setTeamOnePlayersSelected(
+														newMap
+															? teamOnePlayersSelected
+															: new Map()
+													);
 												}
 												console.log(
 													teamOnePlayersSelected
@@ -128,17 +145,27 @@ function Game() {
 										<PlayerButton
 											player={player}
 											onPlayerButtonClick={(
-												player,
 												buttonSelected
 											) => {
 												if (buttonSelected) {
-													teamTwoPlayersSelected[
-														player._id
-													] = player;
+													const newMap =
+														teamTwoPlayersSelected.set(
+															player._id,
+															player
+														);
+													setTeamTwoPlayersSelected(
+														newMap
+													);
 												} else {
-													delete teamTwoPlayersSelected[
-														player._id
-													];
+													const newMap =
+														teamTwoPlayersSelected.delete(
+															player._id
+														);
+													setTeamTwoPlayersSelected(
+														newMap
+															? teamTwoPlayersSelected
+															: new Map()
+													);
 												}
 												console.log(
 													teamTwoPlayersSelected

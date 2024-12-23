@@ -9,7 +9,7 @@ function PlayerButton({ player, onPlayerButtonClick }) {
 			type="button"
 			onClick={() => {
 				setButtonSelected(!buttonSelected);
-				onPlayerButtonClick(player, !buttonSelected);
+				onPlayerButtonClick(!buttonSelected);
 			}}
 		>
 			{player.name}
