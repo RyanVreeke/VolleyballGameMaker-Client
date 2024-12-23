@@ -4,6 +4,8 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 function EditPlayer() {
 	const [playerId, setPlayerId] = useState("");
 	const [name, setName] = useState("");
+	const [wins, setWins] = useState(0);
+	const [losses, setLosses] = useState(0);
 	const [submitted, setSubmitted] = useState(false);
 	const urlSlug = useParams();
 	const serverURL = import.meta.env.VITE_SERVER_URL;
@@ -21,6 +23,8 @@ function EditPlayer() {
 				const jsonData = await response.json();
 				setPlayerId(jsonData._id);
 				setName(jsonData.name);
+				setWins(jsonData.wins);
+				setLosses(jsonData.losses);
 			} catch (error) {
 				console.log(error);
 			}
@@ -42,11 +46,15 @@ function EditPlayer() {
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					name: name,
+					wins: wins,
+					losses: losses,
 				}),
 			});
 
 			if (response.ok) {
 				setName("");
+				setWins(0);
+				setLosses(0);
 				setSubmitted(true);
 			} else {
 				console.log("Failed to submit player data.");
@@ -93,13 +101,34 @@ function EditPlayer() {
 								value={name}
 								onChange={(e) => setName(e.target.value)}
 							/>
-
-							<input type="submit" />
+							<div>
+								<h3>
+									Edit the wins and losses values only if a
+									mistake was made when logging games.
+								</h3>
+							</div>
+							<div>
+								<label>Player Wins</label>
+								<input
+									type="number"
+									value={wins}
+									onChange={(e) => setWins(e.target.value)}
+								/>
+							</div>
+							<div>
+								<label>Player Losses</label>
+								<input
+									type="number"
+									value={losses}
+									onChange={(e) => setLosses(e.target.value)}
+								/>
+							</div>
+							<div>
+								<input type="submit" />
+							</div>
 						</div>
 					</form>
-
 					<br />
-
 					<button onClick={deletePlayer} className="delete">
 						Delete Player
 					</button>
