@@ -61,10 +61,10 @@ function Game() {
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
 						winningTeamPlayers: Object.fromEntries(
-							teamOnePlayersSelected
+							teamTwoPlayersSelected
 						),
 						losingTeamPlayers: Object.fromEntries(
-							teamTwoPlayersSelected
+							teamOnePlayersSelected
 						),
 					}),
 				});
