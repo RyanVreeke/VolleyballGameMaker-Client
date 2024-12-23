@@ -15,7 +15,7 @@ function Header() {
 			<nav>
 				<NavLink to="/">Game</NavLink>
 				<NavLink to="/players">Players</NavLink>
-				{/* <NavLink to="/stats">Stats</NavLink> */}
+				<NavLink to="/match-maker">Match Maker</NavLink>
 			</nav>
 		</header>
 	);

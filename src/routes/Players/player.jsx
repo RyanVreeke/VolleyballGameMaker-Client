@@ -5,7 +5,7 @@ import PlayerCard from "../../components/PlayerCard";
 function Player() {
 	const [data, setData] = useState([]);
 	const urlSlug = useParams();
-  const serverURL = import.meta.env.VITE_SERVER_URL;
+	const serverURL = import.meta.env.VITE_SERVER_URL;
 	const baseURL = `${serverURL}/api/players/${urlSlug.slug}`;
 
 	useEffect(() => {
