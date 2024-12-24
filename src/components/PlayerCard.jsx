@@ -1,7 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-function PlayerCard({ _id, name, wins, losses, showDetails }) {
+function PlayerCard({ _id, name, wins, losses, pointDifferential, showDetails }) {
+	const gameAmount = wins + losses;
 	if (showDetails) {
 		return (
 			<div className="player-card">
@@ -10,8 +11,9 @@ function PlayerCard({ _id, name, wins, losses, showDetails }) {
 				<p className="player-stats">Wins: {wins}</p>
 				<p className="player-stats">Losses: {losses}</p>
 				<p className="player-stats">
-					Win Ratio: {((wins / (wins + losses)) * 100).toFixed(2)}%
+					Win Ratio: {((wins / gameAmount) * 100).toFixed(2)}%
 				</p>
+				<p className="player-stats">Point Differential: {(pointDifferential / gameAmount).toFixed(2)}</p>
 				<Link to={`/players/${_id}`}>Details</Link>
 			</div>
 		);
@@ -23,8 +25,9 @@ function PlayerCard({ _id, name, wins, losses, showDetails }) {
 				<p className="player-stats">Wins: {wins}</p>
 				<p className="player-stats">Losses: {losses}</p>
 				<p className="player-stats">
-					Win Ratio: {((wins / (wins + losses)) * 100).toFixed(2)}%
+					Win Ratio: {((wins / gameAmount) * 100).toFixed(2)}%
 				</p>
+				<p className="player-stats">Point Differential: {(pointDifferential / gameAmount).toFixed(2)}</p>
 			</div>
 		);
 	}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PlayerButton from "../../components/PlayerButton";
 import { fetchPlayers } from "../../helpers/fetchPlayers";
+import { delay } from "../../helpers/delay";
 
 function Game() {
 	const [teamOnePlayersRoster, setTeamOnePlayersRoster] = useState([]);
@@ -15,23 +16,30 @@ function Game() {
 	const [teamTwoScore, setTeamTwoScore] = useState(0);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState(null);
+	const [submitted, setSubmitted] = useState(false);
 	const serverURL = import.meta.env.VITE_SERVER_URL;
 	const baseURL = `${serverURL}/api/players`;
 
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const players = await fetchPlayers();
-				setTeamOnePlayersRoster(players);
-				setTeamTwoPlayersRoster(players);
-				setIsLoading(false);
-			} catch (error) {
-				setError(error);
+	const fetchData = async (hasDelay) => {
+		try {
+			setIsLoading(true);
+			if (hasDelay) {
+				await delay(2000);
+				setSubmitted(false);
 				setIsLoading(false);
 			}
-		};
+			const players = await fetchPlayers();
+			setTeamOnePlayersRoster(players);
+			setTeamTwoPlayersRoster(players);
+			setIsLoading(false);
+		} catch (error) {
+			setError(error);
+			setIsLoading(false);
+		}
+	};
 
-		fetchData();
+	useEffect(() => {
+		fetchData(false);
 	}, []);
 
 	const updatePlayersGameScore = async (e) => {
@@ -52,6 +60,7 @@ function Game() {
 						losingTeamPlayers: Object.fromEntries(
 							teamTwoPlayersSelected
 						),
+						pointDifferential: teamOneScore - teamTwoScore,
 					}),
 				});
 			} else if (teamOneScore < teamTwoScore) {
@@ -66,14 +75,23 @@ function Game() {
 						losingTeamPlayers: Object.fromEntries(
 							teamOnePlayersSelected
 						),
+						pointDifferential: teamTwoScore - teamOneScore,
 					}),
 				});
 			}
 
 			if (response.ok) {
 				console.log("Updated players game score.");
+				setTeamOnePlayersRoster([]);
+				setTeamTwoPlayersRoster([]);
+				setTeamOnePlayersSelected(new Map());
+				setTeamTwoPlayersSelected(new Map());
 				setTeamOneScore(0);
 				setTeamTwoScore(0);
+				setSubmitted(true);
+				fetchData(true);
+				console.log(teamOnePlayersSelected);
+				console.log(teamTwoPlayersSelected);
 			} else {
 				console.log("Failed to update players game data.");
 			}
@@ -87,7 +105,19 @@ function Game() {
 		<div>
 			<h1>Game</h1>
 			{isLoading ? (
-				<p>Loading...</p>
+				<div>
+					{!submitted ? (
+						<div>
+							<h2>Loading...</h2>
+							<p>Sorry for the delay, should be ready shortly.</p>
+						</div>
+					) : (
+						<div>
+							<h2>Game submitted!</h2>
+							<p>Reloading...</p>
+						</div>
+					)}
+				</div>
 			) : error ? (
 				<p>{error}</p>
 			) : (
