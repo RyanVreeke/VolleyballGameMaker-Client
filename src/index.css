@@ -118,6 +118,8 @@ footer {
 	text-align: center;
 	display: inline-block;
 	font-size: 16px;
+	padding: 2px 5px;
+	margin: 3px 0px;
 }
 
 .button-unselected {
@@ -127,6 +129,18 @@ footer {
 	text-align: center;
 	display: inline-block;
 	font-size: 16px;
+	padding: 2px 5px;
+	margin: 3px 0px;
+}
+
+.button-reset {
+	background-color: #007bff; /* Blue */
+	color: white;
+	text-align: center;
+	display: inline-block;
+	font-size: 16px;
+	padding: 2px 5px;
+	margin: 3px 0px;
 }
 
 .row {

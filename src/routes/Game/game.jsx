@@ -24,7 +24,7 @@ function Game() {
 		try {
 			setIsLoading(true);
 			if (hasDelay) {
-				await delay(2000);
+				await delay(1000);
 				setSubmitted(false);
 				setIsLoading(false);
 			}
@@ -164,7 +164,7 @@ function Game() {
 								))}
 							</ul>
 						</div>
-						<div className="row-child">VS</div>
+						<div>VS</div>
 						<div className="row-child">
 							<ul>
 								<li>
