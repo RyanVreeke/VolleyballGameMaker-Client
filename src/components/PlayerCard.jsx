@@ -26,7 +26,8 @@ function PlayerCard({
 					Win Ratio: {(winRatioValue * 100).toFixed(2)}%
 				</p>
 				<p className="player-stats">
-					Point Differential: {pointDifferentialValue.toFixed(2)}
+					Point <br />
+					Differential: {pointDifferentialValue.toFixed(2)}
 				</p>
 				<p className="player-stats">Rating: {ratingValue.toFixed(2)}</p>
 				<Link to={`/players/${_id}`}>Details</Link>

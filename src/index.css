@@ -111,6 +111,11 @@ footer {
 	font-size: 0.8rem;
 }
 
+.button {
+	align-items: center;
+	justify-content: center;
+}
+
 .button-selected {
 	background-color: #04aa6d; /* Green */
 	border: 1px solid #007d9354;
@@ -139,11 +144,12 @@ footer {
 	text-align: center;
 	display: inline-block;
 	font-size: 16px;
-	padding: 2px 5px;
+	padding: 4px 8px;
 	margin: 3px 0px;
 }
 
 .row {
+	list-style-type: none;
 	width: 100%;
 	display: flex;
 	flex-wrap: wrap;
@@ -153,6 +159,7 @@ footer {
 }
 
 .row-child {
+	list-style-type: none;
 	padding: 15px;
 }
 
@@ -160,16 +167,35 @@ footer {
 	margin-left: 0;
 }
 
-ul {
+.grid-list-large {
+  list-style-type: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(225px, 1fr));
+  margin: 0 auto; /* Centers the grid */
+  padding: 0;
+  justify-content: center; /* Ensures items are centered */
+  align-items: center; /* Centers items vertically (if needed) */
+}
+
+.grid-list-small {
 	list-style-type: none;
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(225px, 1fr));
-	margin: 0;
-	padding: 0;
+	grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+	margin: 0 auto; /* Centers the grid */
+  padding: 0;
+  justify-content: center; /* Ensures items are centered */
+  align-items: center; /* Centers items vertically (if needed) */
 }
 
 li {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bold-text {
 	text-align: center;
+  font-weight: bold;
 }
 
 .logo {

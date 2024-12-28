@@ -35,7 +35,7 @@ function Players() {
 			) : error ? (
 				<p>{error}</p>
 			) : (
-				<ul>
+				<ul className="grid-list-large">
 					{data.map((player) => (
 						<li key={player._id}>
 							<PlayerCard {...player} showDetails={true} />

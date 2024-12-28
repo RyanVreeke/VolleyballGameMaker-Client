@@ -31,7 +31,7 @@ function MatchMaker() {
 		return winRate * 1 + (avgPointDifferential / 100) * 1.2;
 	}
 
-	// Step 2: Pair Players into Teams (Balancing Ratings and Handling Uneven Sizes and Team Ratings)
+	// Step 2: Pair Players into Teams (Advanced Balancing with Deeper Lookahead)
 	const pairTeams = (e) => {
 		e.preventDefault();
 
@@ -61,68 +61,96 @@ function MatchMaker() {
 		let teamOneRating = 0.0;
 		let teamTwoRating = 0.0;
 
-		// Weighted priority for smaller team
-		const smallerTeamPriority = Math.min(teamOneSize, teamTwoSize);
-
 		/**
-		 * Helper function to calculate the weighted score of a team.
-		 * A smaller team gets a higher priority for stronger players.
+		 * Helper function to simulate assigning players to teams.
+		 * Evaluates the impact on team ratings with recursive lookahead.
 		 */
-		const calculateTeamScore = (
+		const simulateTeamAssignment = (
 			team,
 			currentRating,
 			size,
-			playerRating
+			opponentTeam,
+			opponentRating,
+			remainingPlayers,
+			depth = 2
 		) => {
-			const adjustedSize = team.length + 1; // Adding the player
-			const newRating = currentRating + playerRating;
-			const averageRating = newRating / adjustedSize;
+			if (depth === 0 || remainingPlayers.length === 0) {
+				// Base case: Return the absolute difference in team ratings
+				return Math.abs(currentRating - opponentRating);
+			}
 
-			// Prioritize smaller teams by boosting their average rating
-			const weight = size === smallerTeamPriority ? 1.2 : 1.0;
-			return averageRating * weight;
+			let bestScore = Infinity;
+
+			// Simulate assigning each remaining player to the current team
+			for (let i = 0; i < remainingPlayers.length; i++) {
+				const player = remainingPlayers[i];
+				const newTeamRating = currentRating + player[1].rating;
+				const newOpponentTeam = [...opponentTeam];
+				const newOpponentRating = opponentRating;
+
+				// Remaining players excluding the current one
+				const nextRemainingPlayers = remainingPlayers
+					.slice(0, i)
+					.concat(remainingPlayers.slice(i + 1));
+
+				// Recursively simulate the next assignments
+				const score = simulateTeamAssignment(
+					team.concat(player),
+					newTeamRating,
+					size,
+					newOpponentTeam,
+					newOpponentRating,
+					nextRemainingPlayers,
+					depth - 1
+				);
+
+				// Track the best score (minimum difference)
+				bestScore = Math.min(bestScore, score);
+			}
+
+			return bestScore;
 		};
 
 		/**
-		 * Helper function to evaluate the impact of assigning a player to a team.
+		 * Distribute players into teams while balancing ratings dynamically.
 		 */
-		const evaluateTeamAssignment = (
-			team,
-			currentRating,
-			size,
-			playerIndex
-		) => {
-			if (team.length >= size) return -Infinity; // Team is full, very low score
-
-			const playerRating = sortedPlayers[playerIndex]?.[1]?.rating || 0;
-			return calculateTeamScore(team, currentRating, size, playerRating);
+		const assignPlayerToTeam = (player, team, teamRating, maxSize) => {
+			if (team.length >= maxSize) return Infinity; // Penalize full teams
+			return teamRating + player[1].rating;
 		};
 
 		// Distribute players while considering team sizes and ratings
 		for (let i = 0; i < sortedPlayers.length; i++) {
 			const player = sortedPlayers[i];
-			const playerRating = player[1].rating;
 
-			const scoreTeamOne = evaluateTeamAssignment(
-				teamOne,
-				teamOneRating,
+			// Simulate assigning the player to each team and evaluate the impact
+			const scoreTeamOne = simulateTeamAssignment(
+				teamOne.concat(player),
+				teamOneRating + player[1].rating,
 				teamOneSize,
-				i
-			);
-			const scoreTeamTwo = evaluateTeamAssignment(
 				teamTwo,
 				teamTwoRating,
-				teamTwoSize,
-				i
+				sortedPlayers.slice(i + 1),
+				2 // Lookahead depth
 			);
 
-			// Assign the player to the team with the higher score
-			if (scoreTeamOne >= scoreTeamTwo) {
+			const scoreTeamTwo = simulateTeamAssignment(
+				teamTwo.concat(player),
+				teamTwoRating + player[1].rating,
+				teamTwoSize,
+				teamOne,
+				teamOneRating,
+				sortedPlayers.slice(i + 1),
+				2 // Lookahead depth
+			);
+
+			// Assign the player to the team with the lower projected score
+			if (scoreTeamOne <= scoreTeamTwo) {
 				teamOne.push(player);
-				teamOneRating += playerRating;
+				teamOneRating += player[1].rating;
 			} else {
 				teamTwo.push(player);
-				teamTwoRating += playerRating;
+				teamTwoRating += player[1].rating;
 			}
 		}
 
@@ -181,7 +209,7 @@ function MatchMaker() {
 					</button>
 					<div className="row">
 						<div className="row-child">
-							<ul>
+							<ul className="grid-list-large">
 								{calculatedTeamOnePlayers.map((player) => (
 									<li key={player[1]._id}>
 										<PlayerCard
@@ -190,14 +218,14 @@ function MatchMaker() {
 										/>
 									</li>
 								))}
-								<li>
+								<li className="bold-text">
 									Team One Rating: {calculatedTeamOneRating}
 								</li>
 							</ul>
 						</div>
 						<div>VS</div>
 						<div className="row-child">
-							<ul>
+							<ul className="grid-list-large">
 								{calculatedTeamTwoPlayers.map((player) => (
 									<li key={player[1]._id}>
 										<PlayerCard
@@ -206,7 +234,7 @@ function MatchMaker() {
 										/>
 									</li>
 								))}
-								<li>
+								<li className="bold-text">
 									Team Two Rating: {calculatedTeamTwoRating}
 								</li>
 							</ul>
@@ -218,14 +246,12 @@ function MatchMaker() {
 					<div>
 						<div className="row">
 							<div className="row-child">
-								<ul>
-									<li>
-										<h2>Participating Players</h2>
-										<p>
-											Select all players that are
-											participating in the game.
-										</p>
-									</li>
+								<h2>Participating Players</h2>
+								<p>
+									Select all players that are participating in
+									the game.
+								</p>
+								<ul className="grid-list-small">
 									{playersParticipating.map((player) => (
 										<li key={player._id}>
 											<PlayerButton
@@ -266,15 +292,7 @@ function MatchMaker() {
 						<form
 							onSubmit={(e) => {
 								e.preventDefault();
-								const teamSizes =
-									Number(teamOnePlayerSize) +
-									Number(teamTwoPlayerSize);
-								if (
-									teamSizes ==
-										playersParticipatingSelected.size &&
-									teamSizes != 0 &&
-									playersParticipatingSelected.size != 0
-								) {
+								if (playersParticipatingSelected.size != 0) {
 									pairTeams(e);
 								} else {
 									toggleTeamSizeError(e);
@@ -282,30 +300,6 @@ function MatchMaker() {
 							}}
 						>
 							<div>
-								<div className="row">
-									<label className="row-child">
-										Select Team One Player Size
-									</label>
-									<input
-										className="row-child"
-										type="number"
-										value={teamOnePlayerSize}
-										onChange={(e) =>
-											setTeamOnePlayerSize(e.target.value)
-										}
-									/>
-									<label className="row-child">
-										Select Team Two Player Size
-									</label>
-									<input
-										className="row-child"
-										type="number"
-										value={teamTwoPlayerSize}
-										onChange={(e) =>
-											setTeamTwoPlayerSize(e.target.value)
-										}
-									/>
-								</div>
 								{teamSizeError && (
 									<div>
 										<h3>

@@ -124,10 +124,8 @@ function Game() {
 				<div>
 					<div className="row">
 						<div className="row-child">
-							<ul>
-								<li>
-									<h2>Team One</h2>
-								</li>
+							<h2>Team One</h2>
+							<ul className="grid-list-small">
 								{teamOnePlayersRoster.map((player) => (
 									<li key={player._id}>
 										<PlayerButton
@@ -166,10 +164,8 @@ function Game() {
 						</div>
 						<div>VS</div>
 						<div className="row-child">
-							<ul>
-								<li>
-									<h2>Team Two</h2>
-								</li>
+							<h2>Team Two</h2>
+							<ul className="grid-list-small">
 								{teamTwoPlayersRoster.map((player) => (
 									<li key={player._id}>
 										<PlayerButton
